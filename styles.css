@@ -359,3 +359,545 @@ h1 { color: #171b20; }
 @media (prefers-reduced-motion: reduce) {
   .bar-row, .destination-detail { animation: none; }
 }
+
+.sidebar {
+  padding: 28px 20px 20px;
+}
+
+.brand {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0 0 48px 4px;
+  width: calc(100% - 4px);
+}
+
+.brand-logo {
+  width: 100%;
+}
+
+.brand-copy {
+  padding-left: 2px;
+}
+
+.brand-copy small {
+  color: #647d8c;
+  font-size: 10px;
+  letter-spacing: 1.15px;
+  line-height: 1.4;
+}
+
+.nav-label {
+  font-size: 10px;
+  margin-bottom: 13px;
+}
+
+.nav-item {
+  font-size: 14px;
+  height: 46px;
+}
+
+.sidebar-note strong {
+  font-size: 17px;
+}
+
+.sidebar-note p,
+.profile-copy small {
+  font-size: 11px;
+}
+
+.profile-copy strong {
+  font-size: 12px;
+}
+
+.topbar {
+  min-height: 70px;
+}
+
+.breadcrumb,
+.academic-year {
+  font-size: 12px;
+}
+
+.dashboard {
+  padding-top: 42px;
+}
+
+.eyebrow {
+  font-size: 11px;
+}
+
+h1 {
+  font-size: clamp(32px, 3.2vw, 40px);
+}
+
+.intro-copy {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.data-status {
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 10px 14px;
+}
+
+.summary-grid {
+  gap: 16px;
+}
+
+.summary-card {
+  min-height: 148px;
+  padding: 20px;
+}
+
+.card-label {
+  font-size: 10px;
+}
+
+.summary-value,
+.year-card .summary-value,
+.gender-card .summary-value {
+  font-size: 36px;
+  margin-top: 16px;
+}
+
+.card-foot,
+.year-card-bottom,
+.gender-card-bottom {
+  font-size: 12px;
+}
+
+.year-card-bottom,
+.gender-card-bottom {
+  margin-top: 13px;
+}
+
+.year-icon,
+.gender-icon {
+  font-size: 10px;
+  height: 28px;
+  width: 28px;
+}
+
+.insights-grid {
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, .9fr);
+  margin-top: 20px;
+}
+
+.panel {
+  border-radius: 14px;
+  padding: 25px 26px 21px;
+}
+
+.panel-kicker {
+  font-size: 10px;
+}
+
+.panel h2 {
+  font-size: 20px;
+  margin: 8px 0 6px;
+}
+
+.panel-description {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.select-wrap {
+  flex: 0 0 auto;
+  height: 40px;
+}
+
+.select-wrap select {
+  font-size: 12px;
+}
+
+.chart-summary {
+  font-size: 12px;
+  margin: 23px 0 5px;
+}
+
+.chart-summary strong,
+.programme-total strong {
+  font-size: 22px;
+}
+
+.bar-chart {
+  gap: 12px;
+  margin: 16px 0 20px;
+}
+
+.bar-row {
+  gap: 14px;
+  grid-template-columns: 90px minmax(35px, 1fr) 34px;
+  min-height: 34px;
+}
+
+.bar-label,
+.bar-value {
+  font-size: 14px;
+}
+
+.bar-track,
+.programme-track {
+  height: 10px;
+}
+
+.chart-footer {
+  font-size: 12px;
+  gap: 9px;
+  padding-top: 15px;
+}
+
+.donut-wrap {
+  padding: 22px 0 17px;
+}
+
+.donut-chart {
+  height: 158px;
+  width: 158px;
+}
+
+.donut-chart::before {
+  height: 118px;
+  width: 118px;
+}
+
+.donut-center strong {
+  font-size: 27px;
+}
+
+.donut-center span {
+  font-size: 9px;
+}
+
+.mix-legend {
+  padding-top: 9px;
+}
+
+.mix-row,
+.mix-row strong {
+  font-size: 14px;
+}
+
+.mix-row small {
+  font-size: 12px;
+}
+
+.programme-visuals {
+  gap: 32px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(230px, .75fr);
+  margin: 24px 0 20px;
+}
+
+.programme-chart {
+  gap: 16px;
+}
+
+.programme-row {
+  gap: 18px;
+  grid-template-columns: minmax(180px, 1.15fr) minmax(70px, 1.7fr) 38px;
+  min-height: 36px;
+}
+
+.programme-name strong {
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.programme-value {
+  font-size: 14px;
+}
+
+.programme-mix {
+  gap: 16px;
+}
+
+.programme-donut {
+  height: 158px;
+  width: 158px;
+}
+
+.programme-donut::after {
+  inset: 21px;
+}
+
+.programme-mix-legend {
+  gap: 9px;
+}
+
+.programme-mix-row {
+  font-size: 12px;
+  gap: 10px;
+  line-height: 1.35;
+}
+
+.programme-mix-row strong {
+  font-size: 12px;
+}
+
+.programme-mix-row > span {
+  min-width: 0;
+}
+
+.dashboard-footer {
+  font-size: 10px;
+  gap: 18px;
+  line-height: 1.5;
+  margin-top: 24px;
+}
+
+.detail-eyebrow,
+.detail-gender-heading {
+  font-size: 9px;
+}
+
+.detail-destination {
+  font-size: 17px;
+}
+
+.detail-total,
+.detail-clear,
+.detail-year,
+.detail-gender-unavailable {
+  font-size: 12px;
+}
+
+.detail-total strong {
+  font-size: 21px;
+}
+
+.detail-year strong,
+.detail-gender strong {
+  font-size: 13px;
+}
+
+.detail-gender > div {
+  font-size: 12px;
+}
+
+.detail-gender-unavailable {
+  line-height: 1.55;
+}
+
+@media (max-width: 1050px) {
+  .insights-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(270px, .9fr);
+  }
+
+  .programme-visuals {
+    gap: 24px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(210px, .8fr);
+  }
+
+  .programme-row {
+    gap: 12px;
+    grid-template-columns: minmax(150px, 1.15fr) minmax(55px, 1.4fr) 34px;
+  }
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    height: 76px;
+  }
+
+  .brand {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+    width: auto;
+  }
+
+  .brand-logo {
+    width: 150px;
+  }
+
+  .brand-copy {
+    display: flex;
+    padding-left: 0;
+  }
+
+  .brand-copy small {
+    font-size: 9px;
+  }
+
+  .main-content {
+    padding-top: 76px;
+  }
+
+  .topbar {
+    min-height: 52px;
+  }
+
+  .breadcrumb,
+  .academic-year {
+    font-size: 11px;
+  }
+
+  .dashboard {
+    padding-top: 30px;
+  }
+
+  .intro {
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .data-status {
+    align-self: flex-start;
+  }
+
+  .summary-grid {
+    gap: 12px;
+  }
+
+  .summary-card {
+    min-height: 136px;
+    padding: 17px;
+  }
+
+  .summary-value,
+  .year-card .summary-value,
+  .gender-card .summary-value {
+    font-size: 32px;
+  }
+
+  .insights-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel {
+    padding: 22px;
+  }
+
+  .programme-visuals {
+    gap: 26px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .programme-row {
+    gap: 16px;
+    grid-template-columns: minmax(0, 1.3fr) minmax(70px, 1fr) 38px;
+  }
+
+  .programme-name {
+    align-items: flex-start;
+    flex-direction: row;
+  }
+
+  .programme-mix {
+    display: grid;
+    grid-template-columns: 158px minmax(0, 1fr);
+  }
+
+  .dashboard-footer {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    gap: 2px;
+  }
+
+  .brand-logo {
+    width: 132px;
+  }
+
+  .brand-copy small {
+    font-size: 8px;
+    letter-spacing: .8px;
+  }
+
+  .breadcrumb,
+  .academic-year {
+    font-size: 10px;
+  }
+
+  .intro-copy {
+    font-size: 13px;
+  }
+
+  .summary-grid {
+    gap: 9px;
+  }
+
+  .summary-card {
+    min-height: 126px;
+    padding: 14px 12px;
+  }
+
+  .card-label {
+    font-size: 9px;
+  }
+
+  .summary-value,
+  .year-card .summary-value,
+  .gender-card .summary-value {
+    font-size: 29px;
+  }
+
+  .year-card-bottom,
+  .gender-card-bottom,
+  .card-foot {
+    font-size: 11px;
+  }
+
+  .panel {
+    padding: 18px 15px;
+  }
+
+  .panel h2 {
+    font-size: 18px;
+  }
+
+  .panel-description {
+    font-size: 12px;
+  }
+
+  .bar-row {
+    gap: 8px;
+    grid-template-columns: 78px minmax(28px, 1fr) 30px;
+  }
+
+  .bar-label,
+  .bar-value {
+    font-size: 12px;
+  }
+
+  .programme-row {
+    gap: 9px;
+    grid-template-columns: minmax(0, 1.25fr) minmax(42px, .9fr) 32px;
+  }
+
+  .programme-name strong,
+  .programme-value {
+    font-size: 12px;
+  }
+
+  .programme-mix {
+    gap: 12px;
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  .programme-donut {
+    height: 112px;
+    width: 112px;
+  }
+
+  .programme-donut::after {
+    inset: 15px;
+  }
+
+  .programme-mix-row,
+  .programme-mix-row strong {
+    font-size: 11px;
+  }
+
+  .dashboard-footer {
+    font-size: 10px;
+  }
+}
