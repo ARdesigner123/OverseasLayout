@@ -296,7 +296,7 @@ function buildDashboardData(rows) {
     throw new Error("Supabase returned an invalid response; expected a list of table rows.");
   }
   if (!rows.length) {
-    throw new Error("Supabase connected, but the publishable key can see 0 rows. Run the read-only anon grant and RLS policy in SUPABASE_SETUP.md, then reload.");
+    throw new Error("Supabase connected, but the anon role can see 0 rows. Run the anon SELECT grant and RLS policy in SUPABASE_SETUP.md, then reload.");
   }
   if (rows.some((row) => (
     yearKeys.some((year) => !Number.isInteger(Number(row[yearColumns[year]])) || Number(row[yearColumns[year]]) < 0)
@@ -362,7 +362,7 @@ function buildDashboardData(rows) {
 
 async function loadDashboardData() {
   if (!config?.url || !config?.publishableKey) {
-    setStatus("Add your Supabase project URL and publishable key in supabase-config.js.", "error");
+    setStatus("Add your Supabase project URL and anon/publishable key in supabase-config.js.", "error");
     return;
   }
 
@@ -376,6 +376,7 @@ async function loadDashboardData() {
       headers: {
         Accept: "application/json",
         apikey: config.publishableKey,
+        Authorization: `Bearer ${config.publishableKey}`,
       },
     });
     if (!response.ok) {

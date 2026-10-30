@@ -1,10 +1,10 @@
 # Supabase setup
 
-The dashboard reads aggregate rows directly from `public.overseas_student_statistics` using the browser-safe publishable key in `supabase-config.js`. A service-role key is not used.
+The dashboard reads aggregate rows directly from `public.overseas_student_statistics` using the browser-safe anon key in `supabase-config.js`. It sends the key in both Supabase REST authentication headers (`apikey` and `Authorization: Bearer`). A service-role key is not used.
 
 ## Allow the dashboard to read the table
 
-The REST endpoint currently returns HTTP 200 but no rows to the publishable key. Since you confirmed records exist, the likely issue is missing `anon` SELECT permission or an RLS policy. Run this in the Supabase SQL Editor:
+The REST endpoint currently returns HTTP 200 but no rows to the anon role. Since you confirmed records exist, the likely issue is missing `anon` SELECT permission or an RLS policy. Run this in the Supabase SQL Editor:
 
 ```sql
 GRANT USAGE ON SCHEMA public TO anon;
