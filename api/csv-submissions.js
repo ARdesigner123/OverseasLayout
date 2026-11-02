@@ -36,7 +36,9 @@ export default async function handler(request, response) {
   response.setHeader("Cache-Control", "no-store");
   if (!["GET", "POST"].includes(request.method)) return sendMethodNotAllowed(response, ["GET", "POST"]);
   if (!hasBlobStorage()) {
-    return response.status(503).json({ error: "CSV uploads are not configured. Connect a private Vercel Blob store to this project." });
+    return response.status(503).json({
+      error: "CSV uploads are not configured. Connect a private Vercel Blob store to this project and redeploy.",
+    });
   }
 
   if (request.method === "GET") {

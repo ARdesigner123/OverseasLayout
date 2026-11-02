@@ -346,24 +346,37 @@ async function getCsvSources() {
     Object.entries(dataFiles).map(([key, fileName]) => [key, fileName]),
   );
   if (window.location.protocol === "file:") {
-    return { sources: fallbackSources, publishedCount: 0, uploadEnabled: false };
+    return {
+      sources: fallbackSources,
+      publishedCount: 0,
+      uploadEnabled: false,
+      uploadMessage: "Uploads require the deployed Vercel site with its Blob store connected.",
+    };
   }
   const response = await fetch("/api/csv-files", { cache: "no-store" });
-  if (response.status === 404) return { sources: fallbackSources, publishedCount: 0, uploadEnabled: false };
+  if (response.status === 404) {
+    return {
+      sources: fallbackSources,
+      publishedCount: 0,
+      uploadEnabled: false,
+      uploadMessage: "Vercel upload functions are unavailable. Deploy this project to Vercel to enable submissions.",
+    };
+  }
   const result = await readApiResponse(response);
   if (!result.sources || typeof result.sources !== "object") throw new Error("The CSV source listing is invalid.");
   return {
     sources: { ...fallbackSources, ...result.sources },
     publishedCount: Number(result.publishedCount) || 0,
     uploadEnabled: result.uploadEnabled === true,
+    uploadMessage: result.uploadMessage,
   };
 }
 
-function setUploadBackendAvailable(available) {
-  for (const control of [uploadFileKey, uploadFile, uploadSubmit, ownerPassword, ownerLoginSubmit]) {
-    control.disabled = !available;
-  }
+function setUploadBackendStatus(available, message) {
   uploadBackendHelp.hidden = available;
+  uploadBackendHelp.textContent = available
+    ? ""
+    : message || "Vercel uploads are not configured. Check the Blob store connection and redeploy.";
 }
 
 async function loadDashboardData() {
@@ -372,8 +385,8 @@ async function loadDashboardData() {
   refreshButton.disabled = true;
   setStatus("Refreshing live CSV files…", "loading");
   try {
-    const { sources, publishedCount, uploadEnabled } = await getCsvSources();
-    setUploadBackendAvailable(uploadEnabled);
+    const { sources, publishedCount, uploadEnabled, uploadMessage } = await getCsvSources();
+    setUploadBackendStatus(uploadEnabled, uploadMessage);
     const entries = await Promise.all(Object.entries(dataFiles).map(async ([key, fileName]) => {
       const url = new URL(sources[key], window.location.href);
       url.searchParams.set("updated", Date.now());
@@ -400,7 +413,7 @@ async function loadDashboardData() {
     return true;
   } catch (error) {
     console.error("Unable to load overseas programme CSV data.", error);
-    setUploadBackendAvailable(false);
+    setUploadBackendStatus(false, `Vercel CSV services are unavailable: ${error.message}`);
     setStatus(`Could not load CSV data. ${error.message}`, "error");
     return false;
   } finally {

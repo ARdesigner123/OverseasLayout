@@ -11,7 +11,12 @@ export default async function handler(request, response) {
   if (request.method !== "GET") return sendMethodNotAllowed(response, ["GET"]);
   if (!hasBlobStorage()) {
     if (request.query.fileName) return response.status(404).send("No approved upload exists.");
-    return response.status(200).json({ sources: availableSources(), publishedCount: 0, uploadEnabled: false });
+    return response.status(200).json({
+      sources: availableSources(),
+      publishedCount: 0,
+      uploadEnabled: false,
+      uploadMessage: "Vercel Blob is not connected yet. Connect a private Blob store to this project, then redeploy to enable submissions.",
+    });
   }
 
   try {
