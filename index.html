@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#7c919f">
-    <meta name="description" content="An overseas programme dashboard showing student participation by year group, destination, gender, and programme.">
+    <meta name="description" content="A live overseas programmes dashboard showing student participation by subcategory, city, course, and year group.">
     <title>Global Learning — Overseas Programmes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="supabase-config.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -18,26 +17,26 @@
       <aside class="sidebar" aria-label="Main navigation">
         <a class="brand" href="#" aria-label="Global Learning home">
           <img class="brand-logo" src="images/logo.jpg" alt="SP School of Computing">
-          <span class="brand-copy"><small>STUDENT EXPERIENCES</small></span>
+          <span class="brand-copy"><small>STUDENT DEVELOPMENT</small></span>
         </a>
 
         <div class="nav-label">WORKSPACE</div>
         <nav class="navigation">
           <a class="nav-item active" href="#overview" aria-current="page">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="5" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="11" width="7" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="8" height="7" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>
-            <span>Overview</span>
+            <span>Overseas Programmes</span>
           </a>
-          <a class="nav-item" href="#destinations">
+          <a class="nav-item" href="#subcategories">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
-            <span>Destinations</span>
+            <span>Subcategories</span>
           </a>
           <a class="nav-item" href="#year-groups">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H6.4A3.4 3.4 0 0 0 3 18.4V20M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM21 20v-1.6a3.4 3.4 0 0 0-2.6-3.3M16.5 3.1a4 4 0 0 1 0 7.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
             <span>Year groups</span>
           </a>
-          <a class="nav-item" href="#programmes">
+          <a class="nav-item" href="#upcoming-trips">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="5" r="2" fill="white" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="12" r="2" fill="white" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="19" r="2" fill="white" stroke="currentColor" stroke-width="1.6"/></svg>
-            <span>Programmes</span>
+            <span>Upcoming Trips</span>
           </a>
         </nav>
 
@@ -61,21 +60,36 @@
         <header class="topbar">
           <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-slash">/</span><strong>Overseas programmes</strong></div>
           <div class="topbar-actions">
-            <span class="academic-year"><span class="status-dot"></span> Academic year 2025/26</span>
-            <button class="icon-button" id="export-button" type="button" aria-label="Download dashboard data as CSV" title="Download CSV" disabled>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="academic-year"><span class="status-dot"></span><span id="as-of-date">As of today</span></span>
+            <button class="icon-button" id="refresh-button" type="button" aria-label="Refresh dashboard data" title="Refresh data">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5m-4.1-2A7.5 7.5 0 0 1 17.7 6L20 8M4 16l2.3 2A7.5 7.5 0 0 0 19.1 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
+            <div class="download-menu">
+              <button class="download-button" id="download-toggle" type="button" aria-expanded="false" aria-controls="download-options">
+                Download CSV
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="download-options" id="download-options" role="menu" aria-label="Choose a CSV file to download">
+                <button type="button" role="menuitem" data-download="year1" disabled>Year 1</button>
+                <button type="button" role="menuitem" data-download="year2" disabled>Year 2</button>
+                <button type="button" role="menuitem" data-download="year3" disabled>Year 3</button>
+                <button type="button" role="menuitem" data-download="upcomingtrips" disabled>Upcoming Trips</button>
+                <button type="button" role="menuitem" id="upload-open" disabled>Upload updated CSV</button>
+              </div>
+            </div>
           </div>
         </header>
 
         <div class="dashboard">
           <section class="intro">
             <div>
-              <div class="eyebrow"><span class="eyebrow-line"></span> SINGAPORE POLYTECHNIC · 2025/26</div>
+              <div class="eyebrow"><span class="eyebrow-line"></span> SINGAPORE POLYTECHNIC · <span id="intro-date">AS OF TODAY</span></div>
               <h1>Overseas programmes<span class="heading-period">.</span></h1>
-              <p class="intro-copy">A clear overview of student participation by year, gender and programme.</p>
+              <p class="intro-copy">Explore student participation by subcategory, destination city, course and year group.</p>
             </div>
-            <div class="data-status" id="data-status" role="status" aria-live="polite" data-state="loading">Connecting to Supabase…</div>
+            <div class="intro-status">
+              <div class="data-status" id="data-status" role="status" aria-live="polite" data-state="loading">Loading CSV files…</div>
+            </div>
           </section>
 
           <section class="summary-grid" id="year-groups" aria-label="Student overview">
@@ -88,37 +102,32 @@
             <button class="summary-card year-card year-one" type="button" data-year-selection="year1" aria-pressed="false" aria-label="Filter dashboard to Year 1 students">
               <div class="card-topline"><span class="card-label">YEAR 1</span><span class="year-icon" aria-hidden="true">01</span></div>
               <div class="summary-value" data-year-total="year1">—</div>
-              <div class="year-card-bottom"><span>students travelled</span><span class="year-progress"><i></i></span></div>
+              <div class="year-card-bottom"><span>unique students</span><span class="year-progress"><i></i></span></div>
             </button>
             <button class="summary-card year-card year-two" type="button" data-year-selection="year2" aria-pressed="false" aria-label="Filter dashboard to Year 2 students">
               <div class="card-topline"><span class="card-label">YEAR 2</span><span class="year-icon" aria-hidden="true">02</span></div>
               <div class="summary-value" data-year-total="year2">—</div>
-              <div class="year-card-bottom"><span>students travelled</span><span class="year-progress"><i></i></span></div>
+              <div class="year-card-bottom"><span>unique students</span><span class="year-progress"><i></i></span></div>
             </button>
             <button class="summary-card year-card year-three" type="button" data-year-selection="year3" aria-pressed="false" aria-label="Filter dashboard to Year 3 students">
               <div class="card-topline"><span class="card-label">YEAR 3</span><span class="year-icon" aria-hidden="true">03</span></div>
               <div class="summary-value" data-year-total="year3">—</div>
-              <div class="year-card-bottom"><span>students travelled</span><span class="year-progress"><i></i></span></div>
+              <div class="year-card-bottom"><span>unique students</span><span class="year-progress"><i></i></span></div>
             </button>
-            <article class="summary-card gender-card male-card">
-              <div class="card-topline"><span class="card-label">MALE STUDENTS</span><span class="gender-icon" aria-hidden="true">M</span></div>
-              <div class="summary-value" id="male-total">—</div>
-              <div class="gender-card-bottom" id="male-period">All year groups</div>
-            </article>
-            <article class="summary-card gender-card female-card">
-              <div class="card-topline"><span class="card-label">FEMALE STUDENTS</span><span class="gender-icon" aria-hidden="true">F</span></div>
-              <div class="summary-value" id="female-total">—</div>
-              <div class="gender-card-bottom" id="female-period">All year groups</div>
+            <article class="summary-card course-summary-card">
+              <div class="card-topline"><span class="card-label">TOP COURSE</span><span class="course-icon" aria-hidden="true">C</span></div>
+              <div class="summary-value" id="top-course">—</div>
+              <div class="course-card-bottom" id="top-course-count">Loading course data</div>
             </article>
           </section>
 
-          <section class="insights-grid" aria-label="Trip insights">
-            <article class="panel destination-panel" id="destinations">
+          <section class="insights-grid" aria-label="Student participation insights">
+            <article class="panel subcategory-panel" id="subcategories">
               <div class="panel-heading">
                 <div>
-                  <div class="panel-kicker">WHERE WE GO</div>
-                  <h2>Students by destination</h2>
-                  <p class="panel-description" id="chart-description">Student participation across all year groups</p>
+                  <div class="panel-kicker">STUDENT DEVELOPMENT</div>
+                  <h2>Students by subcategory</h2>
+                  <p class="panel-description" id="chart-description">Unique student participation across all year groups</p>
                 </div>
                 <label class="select-wrap">
                   <span class="sr-only">Filter dashboard by year group</span>
@@ -131,60 +140,74 @@
                   <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </label>
               </div>
-              <div class="chart-summary"><strong id="chart-total">—</strong><span> students</span><span class="chart-period" id="chart-period">· all year groups</span></div>
-              <div class="bar-chart" id="bar-chart" aria-label="Students by destination"></div>
-              <div class="destination-detail" id="destination-detail" aria-live="polite" hidden></div>
-              <div class="chart-footer"><span class="legend-dot"></span><span>Students travelling to each destination</span><span class="chart-footer-note">6 destinations</span></div>
+              <div class="chart-summary"><strong id="chart-total">—</strong><span> unique students</span><span class="chart-period" id="chart-period">· all year groups</span></div>
+              <div class="bar-chart" id="bar-chart" aria-label="Students by subcategory"></div>
+              <div class="subcategory-detail" id="subcategory-detail" aria-live="polite" hidden></div>
+              <div class="chart-footer"><span class="legend-dot"></span><span>Click a subcategory to see its cities and courses</span></div>
             </article>
 
-            <article class="panel distribution-panel">
+            <article class="panel distribution-panel" id="course-panel">
               <div class="panel-heading">
                 <div>
-                  <div class="panel-kicker">AT A GLANCE</div>
-                  <h2>Year group mix</h2>
-                  <p class="panel-description" id="mix-description">Share of all participating students</p>
+                  <div class="panel-kicker">COURSE PARTICIPATION</div>
+                  <h2 id="course-heading">Students by course</h2>
+                  <p class="panel-description" id="course-description">Unique students in each course</p>
                 </div>
-                <span class="round-info" title="Based on Supabase records" aria-label="Based on Supabase records">i</span>
+                <span class="course-total"><strong id="course-total">—</strong><span> students</span></span>
               </div>
-              <div class="donut-wrap">
-                <div class="donut-chart" id="donut-chart" role="img" aria-label="Year group participation share">
-                  <div class="donut-center"><strong id="donut-total">—</strong><span id="donut-caption">STUDENTS</span></div>
-                </div>
-              </div>
-              <div class="mix-legend">
-                <div class="mix-row" data-mix-year="year1"><span class="mix-name"><i class="mix-dot mix-one"></i>Year 1</span><strong><span class="mix-count">—</span> <small class="mix-share">—</small></strong></div>
-                <div class="mix-row" data-mix-year="year2"><span class="mix-name"><i class="mix-dot mix-two"></i>Year 2</span><strong><span class="mix-count">—</span> <small class="mix-share">—</small></strong></div>
-                <div class="mix-row" data-mix-year="year3"><span class="mix-name"><i class="mix-dot mix-three"></i>Year 3</span><strong><span class="mix-count">—</span> <small class="mix-share">—</small></strong></div>
-              </div>
+              <div class="programme-chart" id="course-chart" role="list" aria-label="Students by course"></div>
+              <div class="chart-footer"><span class="legend-dot"></span><span>Students are counted once in each course</span></div>
             </article>
           </section>
 
-          <section class="panel programme-panel" id="programmes" aria-labelledby="programme-heading">
+          <section class="panel upcoming-panel" id="upcoming-trips" aria-labelledby="upcoming-heading">
             <div class="panel-heading">
               <div>
-                <div class="panel-kicker">PROGRAMME PARTICIPATION</div>
-                <h2 id="programme-heading">Students by programme</h2>
-                <p class="panel-description" id="programme-description">Participation across all year groups</p>
-              </div>
-              <div class="programme-total"><strong id="programme-total">—</strong><span> students</span></div>
-            </div>
-            <div class="programme-visuals">
-              <div class="programme-chart" id="programme-chart" role="list" aria-label="Student participation by programme"></div>
-              <div class="programme-mix">
-                <div class="programme-donut" id="programme-donut" role="img" aria-label="Programme share"></div>
-                <div class="programme-mix-legend" id="programme-mix-legend" aria-label="Programme share legend"></div>
+                <div class="panel-kicker">NEXT ON THE CALENDAR</div>
+                <h2 id="upcoming-heading">Upcoming Trips</h2>
+                <p class="panel-description">Planned departures and current student counts</p>
               </div>
             </div>
-            <div class="chart-footer"><span class="legend-dot"></span><span>Students on each programme</span><span class="chart-footer-note">6 programmes</span></div>
+            <div class="upcoming-trip-grid" id="upcoming-trip-grid" aria-live="polite"></div>
           </section>
 
           <footer class="dashboard-footer">
-            <span><span class="footer-mark">✳</span> Singapore Polytechnic · Student experiences.</span>
-            <span>Dashboard figures are loaded from the overseas student statistics table in Supabase.</span>
+            <span><span class="footer-mark">✳</span> Singapore Polytechnic · Student Development.</span>
+            <span>Student data is loaded from the Year 1, Year 2 and Year 3 CSV files.</span>
           </footer>
         </div>
       </main>
     </div>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <dialog class="upload-dialog" id="upload-dialog" aria-labelledby="upload-heading">
+      <form class="upload-form" id="upload-form">
+        <div class="upload-heading">
+          <div>
+            <div class="panel-kicker">REPLACE LIVE SOURCE</div>
+            <h2 id="upload-heading">Upload updated CSV</h2>
+          </div>
+          <button class="upload-close" id="upload-close" type="button" aria-label="Close upload dialog">×</button>
+        </div>
+        <label class="upload-field">
+          <span>CSV file to replace</span>
+          <select id="upload-file-key" name="fileKey" required>
+            <option value="year1">Year 1</option>
+            <option value="year2">Year 2</option>
+            <option value="year3">Year 3</option>
+            <option value="upcomingtrips">Upcoming Trips</option>
+          </select>
+        </label>
+        <label class="upload-field">
+          <span>Choose updated .csv file</span>
+          <input id="upload-file" name="file" type="file" accept=".csv,text/csv" required>
+        </label>
+        <label class="upload-field">
+          <span>Upload password</span>
+          <input id="upload-password" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="upload-help">This replaces the selected live CSV for everyone. Only upload approved data.</p>
+        <p class="upload-feedback" id="upload-feedback" role="status" aria-live="polite"></p>
+        <button class="upload-submit" id="upload-submit" type="submit">Replace live CSV</button>
+      </form>
+    </dialog>
   </body>
 </html>
