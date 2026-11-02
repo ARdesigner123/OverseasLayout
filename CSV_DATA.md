@@ -4,7 +4,7 @@ The dashboard uses the four CSV files in this repository as its initial and fall
 
 ## One-time Vercel setup
 
-1. In Vercel, open the dashboard project and create a Blob store with **Private** access. Connect the store to the project's Production environment (and Preview/Development if needed). Vercel supplies the server-only `BLOB_READ_WRITE_TOKEN` environment variable.
+1. In Vercel, open the dashboard project and create a Blob store with **Private** access. Connect the store to the project's Production environment (and Preview/Development if needed). A connected store supplies `BLOB_STORE_ID`; Vercel manages `VERCEL_OIDC_TOKEN` for deployed functions. The `BLOB_WEBHOOK_PUBLIC_KEY` variable is for verifying upload webhook signatures, not Blob API authentication.
 2. In **Project → Settings → Environment Variables**, set `CSV_OWNER_PASSWORD` to a unique, randomly generated password of at least 32 characters. Keep it private; do not put it in this repository or share it with CSV submitters. Redeploy after setting environment variables.
 3. Ensure the project is deployed from this repository and that Vercel Functions are enabled. The site uses `api/csv-files.js`, `api/csv-submissions.js`, and `api/owner-session.js`.
 4. Configure Vercel Firewall rate limits for `POST /api/csv-submissions` and `POST /api/owner-session` to reduce upload spam and password guessing. Keep the 2 MB per-file limit in place.
