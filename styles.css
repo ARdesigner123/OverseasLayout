@@ -1140,7 +1140,6 @@ h1 {
 .pending-submission-actions { align-items: center; display: flex; flex: 0 0 auto; gap: 7px; }
 .pending-submission-actions .upload-submit { min-height: 32px; padding: 0 10px; }
 .pending-submission-actions .upload-signout { min-height: 32px; }
-.submission-preview { background: #f6f8f9; border-radius: 6px; color: #52616a; flex: 1 0 100%; font: 10px/1.5 ui-monospace, Consolas, monospace; margin: 0; max-height: 180px; overflow: auto; padding: 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .owner-login-form[hidden],
 #owner-controls[hidden] { display: none; }
 @media (max-width: 720px) {

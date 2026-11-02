@@ -20,7 +20,7 @@ Visitors open **Download CSV → Upload a CSV**, select one of the current datas
 - `Year3.csv`
 - `UpcomingTrips.csv`
 
-The website validates the file name, CSV headers, row structure, required values, and 2 MB maximum. Submissions are stored privately and are visible only after the owner signs in with `CSV_OWNER_PASSWORD`. The owner can approve a submission to replace its selected live CSV, or delete it from the review queue. Approving updates the dashboard immediately; deleting a submission leaves live data unchanged.
+The website validates the file name, CSV headers, row structure, required values, and 2 MB maximum. Submissions are stored privately and are visible only after the owner signs in with `CSV_OWNER_PASSWORD`. The owner can download a submission to inspect it on their computer, approve it to replace its selected live CSV, or delete it from the review queue. Approving updates the dashboard immediately; deleting a submission leaves live data unchanged.
 
 The owner password creates an eight-hour, HttpOnly, SameSite cookie. Signing out clears that cookie. Use HTTPS on the deployed site.
 

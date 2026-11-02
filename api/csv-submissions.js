@@ -105,7 +105,7 @@ export default async function handler(request, response) {
     const pending = await get(submission.pathname, { access: "private" });
     if (!pending || pending.statusCode !== 200) return response.status(404).json({ error: "That pending submission could not be read." });
     const csv = await new Response(pending.stream).text();
-    if (action === "preview") {
+    if (action === "download") {
       return response.status(200).json({ fileName: csvFiles[submission.pathname.match(submissionPathPattern)[2].toLowerCase()], csv });
     }
     if (action !== "approve") return response.status(400).json({ error: "Unsupported submission action." });

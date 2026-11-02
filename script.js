@@ -541,11 +541,11 @@ async function loadPendingSubmissions() {
       details.append(fileName, date);
       const actions = document.createElement("div");
       actions.className = "pending-submission-actions";
-      const previewButton = document.createElement("button");
-      previewButton.className = "upload-signout";
-      previewButton.type = "button";
-      previewButton.textContent = "Preview";
-      previewButton.addEventListener("click", () => previewSubmission(submission, item));
+      const downloadButton = document.createElement("button");
+      downloadButton.className = "upload-signout";
+      downloadButton.type = "button";
+      downloadButton.textContent = "Download";
+      downloadButton.addEventListener("click", () => downloadSubmission(submission));
       const approveButton = document.createElement("button");
       approveButton.className = "upload-submit";
       approveButton.type = "button";
@@ -556,7 +556,7 @@ async function loadPendingSubmissions() {
       deleteButton.type = "button";
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", () => manageSubmission("delete", submission));
-      actions.append(previewButton, approveButton, deleteButton);
+      actions.append(downloadButton, approveButton, deleteButton);
       item.append(details, actions);
       pendingSubmissions.append(item);
     }
@@ -565,23 +565,24 @@ async function loadPendingSubmissions() {
   }
 }
 
-async function previewSubmission(submission, item) {
-  ownerFeedback.textContent = `Loading ${submission.fileName} preview…`;
+async function downloadSubmission(submission) {
+  ownerFeedback.textContent = `Preparing ${submission.fileName} for download…`;
   try {
     const response = await fetch("/api/csv-submissions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "preview", id: submission.id }),
+      body: JSON.stringify({ action: "download", id: submission.id }),
     });
     const result = await readApiResponse(response);
-    let preview = item.querySelector(".submission-preview");
-    if (!preview) {
-      preview = document.createElement("pre");
-      preview.className = "submission-preview";
-      item.append(preview);
-    }
-    preview.textContent = result.csv;
-    ownerFeedback.textContent = `Preview loaded for ${result.fileName}.`;
+    const url = URL.createObjectURL(new Blob([result.csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = result.fileName;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    ownerFeedback.textContent = `${result.fileName} downloaded.`;
   } catch (error) {
     ownerFeedback.textContent = error.message;
   }
