@@ -26,13 +26,24 @@ const uploadDialog = document.querySelector("#upload-dialog");
 const uploadForm = document.querySelector("#upload-form");
 const uploadFileKey = document.querySelector("#upload-file-key");
 const uploadFile = document.querySelector("#upload-file");
-const uploadPassword = document.querySelector("#upload-password");
 const uploadFeedback = document.querySelector("#upload-feedback");
 const uploadSubmit = document.querySelector("#upload-submit");
+const uploadBackendHelp = document.querySelector("#upload-backend-help");
+const ownerLoginForm = document.querySelector("#owner-login-form");
+const ownerPassword = document.querySelector("#owner-password");
+const ownerFeedback = document.querySelector("#owner-feedback");
+const ownerLoginSubmit = document.querySelector("#owner-login-submit");
+const ownerControls = document.querySelector("#owner-controls");
+const pendingSubmissions = document.querySelector("#pending-submissions");
+const liveCsvList = document.querySelector("#live-csv-list");
 const dashboardData = { students: {}, trips: [], sourceFiles: {} };
 let selectedYear = "all";
 let selectedSubcategory = null;
 let refreshInProgress = false;
+let ownerSignedIn = false;
+let navScrollFrame = 0;
+let pendingNavigationItem = null;
+let navSettleTimeout = 0;
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
@@ -292,7 +303,9 @@ function renderTrips(trips) {
         <span><strong>${Number(trip["Year 1"]).toLocaleString()}</strong> Year 1</span>
         <span><strong>${Number(trip["Year 2"]).toLocaleString()}</strong> Year 2</span>
       </div>
-      <p class="trip-notes">${escapeHtml(trip.Notes || "No additional notes.")}</p>
+      <p class="trip-notes">${escapeHtml(
+    trip.Notes || (trip.City.trim().toLowerCase() === "batam" ? "No additional note." : "No additional notes."),
+  )}</p>
     </article>
   `).join("");
 }
@@ -322,29 +335,35 @@ function renderDashboard() {
   renderCourses(rows);
 }
 
+async function readApiResponse(response) {
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
+  return result;
+}
+
 async function getCsvSources() {
+  const fallbackSources = Object.fromEntries(
+    Object.entries(dataFiles).map(([key, fileName]) => [key, fileName]),
+  );
   if (window.location.protocol === "file:") {
-    return {
-      sources: Object.fromEntries(Object.entries(dataFiles).map(([key, fileName]) => [key, fileName])),
-      uploadEnabled: false,
-    };
+    return { sources: fallbackSources, publishedCount: 0, uploadEnabled: false };
   }
   const response = await fetch("/api/csv-files", { cache: "no-store" });
-  if (response.status === 404) {
-    return {
-      sources: Object.fromEntries(Object.entries(dataFiles).map(([key, fileName]) => [key, fileName])),
-      uploadEnabled: false,
-    };
-  }
-  if (!response.ok) throw new Error(`CSV storage lookup failed (${response.status} ${response.statusText}).`);
-  const result = await response.json();
+  if (response.status === 404) return { sources: fallbackSources, publishedCount: 0, uploadEnabled: false };
+  const result = await readApiResponse(response);
+  if (!result.sources || typeof result.sources !== "object") throw new Error("The CSV source listing is invalid.");
   return {
+    sources: { ...fallbackSources, ...result.sources },
+    publishedCount: Number(result.publishedCount) || 0,
     uploadEnabled: result.uploadEnabled === true,
-    sources: Object.fromEntries(Object.entries(dataFiles).map(([key, fileName]) => [
-      key,
-      typeof result.sources?.[key] === "string" && result.sources[key] ? result.sources[key] : fileName,
-    ])),
   };
+}
+
+function setUploadBackendAvailable(available) {
+  for (const control of [uploadFileKey, uploadFile, uploadSubmit, ownerPassword, ownerLoginSubmit]) {
+    control.disabled = !available;
+  }
+  uploadBackendHelp.hidden = available;
 }
 
 async function loadDashboardData() {
@@ -353,7 +372,8 @@ async function loadDashboardData() {
   refreshButton.disabled = true;
   setStatus("Refreshing live CSV files…", "loading");
   try {
-    const { sources, uploadEnabled } = await getCsvSources();
+    const { sources, publishedCount, uploadEnabled } = await getCsvSources();
+    setUploadBackendAvailable(uploadEnabled);
     const entries = await Promise.all(Object.entries(dataFiles).map(async ([key, fileName]) => {
       const url = new URL(sources[key], window.location.href);
       url.searchParams.set("updated", Date.now());
@@ -372,13 +392,15 @@ async function loadDashboardData() {
     renderTrips(trips);
     Object.assign(dashboardData, { students, trips, sourceFiles: files });
     renderDashboard();
-    uploadOpen.disabled = !uploadEnabled;
+    renderCurrentCsvList();
     const refreshedAt = new Intl.DateTimeFormat("en-SG", { hour: "numeric", minute: "2-digit" }).format(new Date());
-    setStatus(`Live CSV files · refreshed ${refreshedAt}`, "connected");
+    const sourceLabel = publishedCount ? `Approved Vercel CSVs · ${publishedCount}/4 updated` : "Bundled CSVs";
+    setStatus(`${sourceLabel} · refreshed ${refreshedAt}`, "connected");
     document.querySelectorAll("[data-download]").forEach((button) => { button.disabled = false; });
     return true;
   } catch (error) {
     console.error("Unable to load overseas programme CSV data.", error);
+    setUploadBackendAvailable(false);
     setStatus(`Could not load CSV data. ${error.message}`, "error");
     return false;
   } finally {
@@ -401,17 +423,45 @@ function downloadCsv(fileKey) {
   URL.revokeObjectURL(url);
 }
 
+function renderCurrentCsvList() {
+  liveCsvList.replaceChildren();
+  for (const [fileKey, fileName] of Object.entries(dataFiles)) {
+    const file = dashboardData.sourceFiles[fileKey];
+    const count = fileKey === "upcomingtrips"
+      ? `${dashboardData.trips.length} trip records`
+      : `${uniqueCount(dashboardData.students[fileKey] || [])} unique students`;
+    const button = document.createElement("button");
+    button.className = "live-csv-item";
+    button.type = "button";
+    button.dataset.csvTarget = fileKey;
+    button.setAttribute("aria-pressed", String(uploadFileKey.value === fileKey));
+    const name = document.createElement("strong");
+    name.textContent = fileName;
+    const status = document.createElement("span");
+    status.textContent = file?.url?.startsWith("/api/csv-files") ? "Owner-approved live file" : "Bundled live file";
+    const details = document.createElement("small");
+    details.textContent = count;
+    button.append(name, status, details);
+    liveCsvList.append(button);
+  }
+}
+
+function updateSelectedCsvTarget() {
+  document.querySelectorAll("[data-csv-target]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.csvTarget === uploadFileKey.value));
+  });
+}
+
 async function handleCsvUpload(event) {
   event.preventDefault();
   const file = uploadFile.files[0];
   const fileKey = uploadFileKey.value;
-  const password = uploadPassword.value;
-  if (password.length < 24) {
-    uploadFeedback.textContent = "The upload password must be at least 24 characters.";
+  if (!file || !dataFiles[fileKey]) {
+    uploadFeedback.textContent = "Choose a CSV file and the dataset it should update.";
     return;
   }
-  if (!file || !dataFiles[fileKey] || !file.name.toLowerCase().endsWith(".csv")) {
-    uploadFeedback.textContent = "Choose a CSV file and the matching dataset.";
+  if (file.name.toLowerCase() !== dataFiles[fileKey].toLowerCase()) {
+    uploadFeedback.textContent = `The file must be named ${dataFiles[fileKey]} to update this dataset.`;
     return;
   }
   if (file.size > 2 * 1024 * 1024) {
@@ -420,40 +470,172 @@ async function handleCsvUpload(event) {
   }
 
   uploadSubmit.disabled = true;
-  uploadFeedback.textContent = "Validating CSV…";
+  uploadFeedback.textContent = "Checking CSV…";
   try {
     const text = await file.text();
     const rows = parseCsv(text, dataFiles[fileKey]);
     if (fileKey === "upcomingtrips") validateTrips(rows);
     else normalizeStudentRows(rows, fileKey, dataFiles[fileKey]);
 
-    uploadFeedback.textContent = "Replacing the live CSV…";
-    const response = await fetch("/api/upload-csv", {
+    uploadFeedback.textContent = "Sending for owner review…";
+    const response = await fetch("/api/csv-submissions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileKey, password, csv: text }),
+      body: JSON.stringify({ action: "submit", fileKey, fileName: file.name, csv: text }),
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || `Upload failed (${response.status}).`);
-
-    uploadFeedback.textContent = `${dataFiles[fileKey]} replaced. Refreshing dashboard…`;
-    uploadPassword.value = "";
-    const refreshed = await loadDashboardData();
-    uploadDialog.close();
-    uploadForm.reset();
-    if (refreshed) {
-      setStatus(`${dataFiles[fileKey]} replaced · live data refreshed`, "connected");
-    } else {
-      setStatus(`${dataFiles[fileKey]} replaced, but the dashboard could not refresh. Try Refresh data.`, "error");
-    }
+    await readApiResponse(response);
+    uploadFeedback.textContent = `${dataFiles[fileKey]} was submitted privately for owner review. The live dashboard is unchanged until it is approved.`;
+    uploadFile.value = "";
+    if (ownerSignedIn) await loadPendingSubmissions();
   } catch (error) {
-    console.error("Unable to replace the live CSV file.", error);
+    console.error("Unable to submit the CSV file for review.", error);
     uploadFeedback.textContent = error.message;
   } finally {
     uploadSubmit.disabled = false;
   }
 }
 
+function setOwnerSignedIn(isOwner) {
+  ownerSignedIn = isOwner;
+  ownerLoginForm.hidden = isOwner;
+  ownerControls.hidden = !isOwner;
+  if (isOwner) loadPendingSubmissions();
+}
+
+async function loadPendingSubmissions() {
+  pendingSubmissions.replaceChildren();
+  try {
+    const response = await fetch("/api/csv-submissions", { cache: "no-store" });
+    const result = await readApiResponse(response);
+    if (!result.submissions.length) {
+      const empty = document.createElement("p");
+      empty.className = "upload-help";
+      empty.textContent = "No pending CSV submissions.";
+      pendingSubmissions.append(empty);
+      return;
+    }
+    for (const submission of result.submissions) {
+      const item = document.createElement("article");
+      item.className = "pending-submission";
+      const details = document.createElement("div");
+      const fileName = document.createElement("strong");
+      fileName.textContent = submission.fileName;
+      const date = document.createElement("small");
+      date.textContent = new Intl.DateTimeFormat("en-SG", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(submission.uploadedAt));
+      details.append(fileName, date);
+      const actions = document.createElement("div");
+      actions.className = "pending-submission-actions";
+      const previewButton = document.createElement("button");
+      previewButton.className = "upload-signout";
+      previewButton.type = "button";
+      previewButton.textContent = "Preview";
+      previewButton.addEventListener("click", () => previewSubmission(submission, item));
+      const approveButton = document.createElement("button");
+      approveButton.className = "upload-submit";
+      approveButton.type = "button";
+      approveButton.textContent = "Approve";
+      approveButton.addEventListener("click", () => manageSubmission("approve", submission));
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "upload-signout";
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => manageSubmission("delete", submission));
+      actions.append(previewButton, approveButton, deleteButton);
+      item.append(details, actions);
+      pendingSubmissions.append(item);
+    }
+  } catch (error) {
+    ownerFeedback.textContent = error.message;
+  }
+}
+
+async function previewSubmission(submission, item) {
+  ownerFeedback.textContent = `Loading ${submission.fileName} preview…`;
+  try {
+    const response = await fetch("/api/csv-submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "preview", id: submission.id }),
+    });
+    const result = await readApiResponse(response);
+    let preview = item.querySelector(".submission-preview");
+    if (!preview) {
+      preview = document.createElement("pre");
+      preview.className = "submission-preview";
+      item.append(preview);
+    }
+    preview.textContent = result.csv;
+    ownerFeedback.textContent = `Preview loaded for ${result.fileName}.`;
+  } catch (error) {
+    ownerFeedback.textContent = error.message;
+  }
+}
+
+async function manageSubmission(action, submission) {
+  ownerFeedback.textContent = action === "approve" ? "Approving submission…" : "Deleting submission…";
+  try {
+    const response = await fetch("/api/csv-submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, id: submission.id }),
+    });
+    const result = await readApiResponse(response);
+    ownerFeedback.textContent = action === "approve"
+      ? `${result.fileName} approved. Refreshing dashboard data…`
+      : `${submission.fileName} submission deleted.`;
+    if (action === "approve") await loadDashboardData();
+    await loadPendingSubmissions();
+  } catch (error) {
+    ownerFeedback.textContent = error.message;
+  }
+}
+
+async function handleOwnerLogin(event) {
+  event.preventDefault();
+  ownerLoginSubmit.disabled = true;
+  ownerFeedback.textContent = "Verifying owner access…";
+  try {
+    const response = await fetch("/api/owner-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: ownerPassword.value }),
+    });
+    const result = await readApiResponse(response);
+    ownerPassword.value = "";
+    ownerFeedback.textContent = "Owner access confirmed.";
+    setOwnerSignedIn(result.isOwner === true);
+  } catch (error) {
+    ownerFeedback.textContent = error.message;
+  } finally {
+    ownerLoginSubmit.disabled = false;
+  }
+}
+
+async function restoreOwnerSession() {
+  try {
+    const response = await fetch("/api/owner-session", { cache: "no-store" });
+    if (!response.ok) return;
+    const result = await response.json();
+    if (result.isOwner) setOwnerSignedIn(true);
+  } catch (error) {
+    console.error("Unable to restore owner access.", error);
+  }
+}
+
+async function signOutOwner() {
+  try {
+    const response = await fetch("/api/owner-session", { method: "DELETE" });
+    await readApiResponse(response);
+    setOwnerSignedIn(false);
+    ownerLoginForm.reset();
+    ownerFeedback.textContent = "";
+  } catch (error) {
+    ownerFeedback.textContent = error.message;
+  }
+}
 function setYear(year) {
   selectedYear = selectedYear === year ? "all" : year;
   renderDashboard();
@@ -468,6 +650,85 @@ function updateDate() {
   document.querySelector("#as-of-date").textContent = `As of ${today}`;
   document.querySelector("#intro-date").textContent = `AS OF ${today.toUpperCase()}`;
 }
+
+function activateNavigationItem(item) {
+  const navigation = document.querySelector(".navigation");
+  const navItems = [...document.querySelectorAll(".navigation .nav-item")];
+  navItems.forEach((navItem) => {
+    const active = navItem === item;
+    navItem.classList.toggle("active", active);
+    if (active) navItem.setAttribute("aria-current", "page");
+    else navItem.removeAttribute("aria-current");
+  });
+  const indicator = document.querySelector("#nav-indicator");
+  navigation.classList.toggle("has-active", Boolean(item));
+  if (indicator && item) {
+    const top = item.offsetTop + (item.offsetHeight - indicator.offsetHeight) / 2;
+    indicator.style.transform = `translateY(${top}px)`;
+  }
+}
+
+function updateNavigationFromScroll() {
+  navScrollFrame = 0;
+  if (pendingNavigationItem) {
+    activateNavigationItem(pendingNavigationItem);
+    return;
+  }
+  const items = [...document.querySelectorAll(".navigation .nav-item")];
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+    activateNavigationItem(items.at(-1));
+    return;
+  }
+  const threshold = Math.min(window.innerHeight * 0.18, 120);
+  let activeItem = items[0];
+  let activeTop = Number.NEGATIVE_INFINITY;
+  items.forEach((item) => {
+    const target = document.querySelector(item.getAttribute("href"));
+    const top = target?.getBoundingClientRect().top;
+    if (top !== undefined && top <= threshold && top > activeTop) {
+      activeItem = item;
+      activeTop = top;
+    }
+  });
+  activateNavigationItem(activeItem);
+}
+
+document.querySelectorAll(".navigation .nav-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    pendingNavigationItem = item;
+    window.clearTimeout(navSettleTimeout);
+    activateNavigationItem(item);
+    const target = document.querySelector(item.getAttribute("href"));
+    if (target) {
+      target.classList.remove("section-arrival");
+      window.requestAnimationFrame(() => target.classList.add("section-arrival"));
+      window.setTimeout(() => target.classList.remove("section-arrival"), 900);
+    }
+    navSettleTimeout = window.setTimeout(() => {
+      pendingNavigationItem = null;
+      updateNavigationFromScroll();
+    }, 180);
+  });
+});
+window.addEventListener("scroll", () => {
+  if (pendingNavigationItem) {
+    window.clearTimeout(navSettleTimeout);
+    navSettleTimeout = window.setTimeout(() => {
+      pendingNavigationItem = null;
+      updateNavigationFromScroll();
+    }, 180);
+  }
+  if (!navScrollFrame) navScrollFrame = window.requestAnimationFrame(updateNavigationFromScroll);
+}, { passive: true });
+window.addEventListener("resize", () => {
+  pendingNavigationItem = null;
+  window.clearTimeout(navSettleTimeout);
+  updateNavigationFromScroll();
+});
+window.addEventListener("hashchange", () => {
+  if (pendingNavigationItem) activateNavigationItem(pendingNavigationItem);
+  else updateNavigationFromScroll();
+});
 
 filter.addEventListener("change", (event) => {
   selectedYear = event.target.value;
@@ -493,10 +754,20 @@ document.querySelector("#upload-open").addEventListener("click", () => {
   downloadToggle.setAttribute("aria-expanded", "false");
   downloadOptions.classList.remove("is-open");
   uploadFeedback.textContent = "";
+  updateSelectedCsvTarget();
   uploadDialog.showModal();
 });
 document.querySelector("#upload-close").addEventListener("click", () => uploadDialog.close());
 uploadForm.addEventListener("submit", handleCsvUpload);
+ownerLoginForm.addEventListener("submit", handleOwnerLogin);
+document.querySelector("#owner-signout").addEventListener("click", signOutOwner);
+uploadFileKey.addEventListener("change", updateSelectedCsvTarget);
+liveCsvList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-csv-target]");
+  if (!button) return;
+  uploadFileKey.value = button.dataset.csvTarget;
+  updateSelectedCsvTarget();
+});
 document.addEventListener("click", (event) => {
   if (!event.target.closest(".download-menu")) {
     downloadToggle.setAttribute("aria-expanded", "false");
@@ -505,5 +776,7 @@ document.addEventListener("click", (event) => {
 });
 
 updateDate();
+updateNavigationFromScroll();
+restoreOwnerSession();
 loadDashboardData();
 window.setInterval(loadDashboardData, 60_000);

@@ -22,6 +22,7 @@
 
         <div class="nav-label">WORKSPACE</div>
         <nav class="navigation">
+          <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
           <a class="nav-item active" href="#overview" aria-current="page">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="5" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="11" width="7" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="8" height="7" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>
             <span>Overseas Programmes</span>
@@ -74,7 +75,7 @@
                 <button type="button" role="menuitem" data-download="year2" disabled>Year 2</button>
                 <button type="button" role="menuitem" data-download="year3" disabled>Year 3</button>
                 <button type="button" role="menuitem" data-download="upcomingtrips" disabled>Upcoming Trips</button>
-                <button type="button" role="menuitem" id="upload-open" disabled>Upload updated CSV</button>
+                <button type="button" role="menuitem" id="upload-open">Upload a CSV</button>
               </div>
             </div>
           </div>
@@ -88,7 +89,7 @@
               <p class="intro-copy">Explore student participation by subcategory, destination city, course and year group.</p>
             </div>
             <div class="intro-status">
-              <div class="data-status" id="data-status" role="status" aria-live="polite" data-state="loading">Loading CSV files…</div>
+              <div class="data-status" id="data-status" role="status" aria-live="polite" data-state="loading">Loading dashboard CSVs…</div>
             </div>
           </section>
 
@@ -178,36 +179,74 @@
         </div>
       </main>
     </div>
-    <dialog class="upload-dialog" id="upload-dialog" aria-labelledby="upload-heading">
-      <form class="upload-form" id="upload-form">
+    <dialog class="upload-dialog csv-manager-dialog" id="upload-dialog" aria-labelledby="upload-heading">
+      <div class="csv-manager">
         <div class="upload-heading">
           <div>
-            <div class="panel-kicker">REPLACE LIVE SOURCE</div>
-            <h2 id="upload-heading">Upload updated CSV</h2>
+            <div class="panel-kicker">COMMUNITY DATA UPDATES</div>
+            <h2 id="upload-heading">CSV submissions</h2>
+            <p class="upload-help">Uploads are checked and held for owner approval. They do not change the dashboard until approved.</p>
           </div>
           <button class="upload-close" id="upload-close" type="button" aria-label="Close upload dialog">×</button>
         </div>
-        <label class="upload-field">
-          <span>CSV file to replace</span>
-          <select id="upload-file-key" name="fileKey" required>
-            <option value="year1">Year 1</option>
-            <option value="year2">Year 2</option>
-            <option value="year3">Year 3</option>
-            <option value="upcomingtrips">Upcoming Trips</option>
-          </select>
-        </label>
-        <label class="upload-field">
-          <span>Choose updated .csv file</span>
-          <input id="upload-file" name="file" type="file" accept=".csv,text/csv" required>
-        </label>
-        <label class="upload-field">
-          <span>Upload password</span>
-          <input id="upload-password" name="password" type="password" autocomplete="current-password" required>
-        </label>
-        <p class="upload-help">This replaces the selected live CSV for everyone. Only upload approved data.</p>
-        <p class="upload-feedback" id="upload-feedback" role="status" aria-live="polite"></p>
-        <button class="upload-submit" id="upload-submit" type="submit">Replace live CSV</button>
-      </form>
+        <div class="csv-manager-grid">
+          <section class="csv-manager-panel" aria-labelledby="live-csv-heading">
+            <div class="csv-manager-panel-heading">
+              <div class="panel-kicker">CURRENTLY DISPLAYED</div>
+              <h3 id="live-csv-heading">Live CSV files</h3>
+              <p>Select a dataset to submit an update for it.</p>
+            </div>
+            <div class="live-csv-list" id="live-csv-list"></div>
+          </section>
+          <section class="csv-manager-panel" aria-labelledby="submission-heading">
+            <div class="csv-manager-panel-heading">
+              <div class="panel-kicker">PUBLIC SUBMISSION</div>
+              <h3 id="submission-heading">Submit a CSV for review</h3>
+              <p>Anyone can submit a correctly formatted file. It stays private until the owner reviews it.</p>
+            </div>
+            <p class="upload-feedback" id="upload-backend-help" role="status">CSV submissions are enabled after the Vercel Blob store is connected.</p>
+            <form id="upload-form" class="csv-upload-form">
+              <label class="upload-field">
+                <span>Dataset to update</span>
+                <select id="upload-file-key" name="fileKey" required>
+                  <option value="year1">Year 1 — Year1.csv</option>
+                  <option value="year2">Year 2 — Year2.csv</option>
+                  <option value="year3">Year 3 — Year3.csv</option>
+                  <option value="upcomingtrips">Upcoming Trips — UpcomingTrips.csv</option>
+                </select>
+              </label>
+              <label class="upload-field">
+                <span>Choose CSV file</span>
+                <input id="upload-file" name="file" type="file" accept=".csv,text/csv" required>
+              </label>
+              <p class="upload-help">The filename must match the selected dataset. Maximum file size: 2 MB.</p>
+              <p class="upload-feedback" id="upload-feedback" role="status" aria-live="polite"></p>
+              <button class="upload-submit" id="upload-submit" type="submit">Submit for review</button>
+            </form>
+            <div class="owner-access">
+              <div class="csv-manager-panel-heading">
+                <div class="panel-kicker">OWNER REVIEW</div>
+                <h3>Manage submissions</h3>
+              </div>
+              <form id="owner-login-form" class="owner-login-form">
+                <label class="upload-field">
+                  <span>Owner password</span>
+                  <input id="owner-password" name="password" type="password" autocomplete="current-password" required>
+                </label>
+                <p class="upload-feedback" id="owner-feedback" role="status" aria-live="polite"></p>
+                <button class="upload-submit" id="owner-login-submit" type="submit">Owner sign in</button>
+              </form>
+              <div id="owner-controls" hidden>
+                <div class="owner-session">
+                  <span>Signed in as dashboard owner</span>
+                  <button class="upload-signout" id="owner-signout" type="button">Sign out</button>
+                </div>
+                <div class="pending-submissions" id="pending-submissions" aria-live="polite"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
     </dialog>
   </body>
 </html>

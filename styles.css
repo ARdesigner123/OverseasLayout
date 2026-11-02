@@ -1076,3 +1076,86 @@ h1 {
 @media (max-width: 420px) {
   .upload-form { gap: 13px; padding: 19px; }
 }
+.navigation { position: relative; }
+.nav-indicator {
+  background: linear-gradient(180deg, #49a878, #718ac4);
+  border-radius: 0 5px 5px 0;
+  box-shadow: 0 0 14px #718ac455;
+  height: 30px;
+  left: -19px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: translateY(0);
+  transition: transform .38s cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+  width: 4px;
+  z-index: 1;
+}
+.navigation.has-active .nav-indicator { opacity: 1; }
+.nav-item { position: relative; transition: background .24s ease, color .24s ease, transform .24s ease; }
+.nav-item svg { transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.nav-item:hover { transform: translateX(3px); }
+.nav-item.active { background: linear-gradient(100deg, #eaf0f3 0%, #f5f8f9 100%); box-shadow: inset 0 0 0 1px #e0e8ec; }
+.nav-item.active svg { transform: scale(1.08) rotate(-5deg); }
+.nav-item:active { transform: translateX(2px) scale(.985); }
+.section-arrival { animation: section-arrival .85s ease-out; }
+@keyframes section-arrival {
+  0% { filter: brightness(1); }
+  35% { filter: brightness(.97); }
+  100% { filter: brightness(1); }
+}
+.upload-signout { background: transparent; border: 1px solid #dfe6ea; border-radius: 6px; color: #526a79; cursor: pointer; font-size: 10px; padding: 6px 9px; }
+.upload-signout:hover { background: #edf2f4; }
+.upload-signout:focus-visible { outline: 3px solid #778d9b66; outline-offset: 3px; }
+.csv-manager-dialog {
+  max-height: min(90vh, 900px);
+  max-width: min(1040px, calc(100vw - 32px));
+  overflow: auto;
+}
+.csv-manager { display: grid; gap: 22px; padding: 26px; }
+.csv-manager > .upload-heading { border-bottom: 1px solid #e8edef; padding-bottom: 18px; }
+.csv-manager > .upload-heading .upload-help { margin: 8px 0 0; max-width: 580px; }
+.csv-manager-grid { display: grid; gap: 20px; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.csv-manager-panel { align-content: start; background: #f8fafb; border: 1px solid #e5ebee; border-radius: 11px; display: grid; gap: 16px; padding: 18px; }
+.csv-manager-panel-heading { display: grid; gap: 5px; }
+.csv-manager-panel-heading h3 { color: #28363d; font: 700 15px var(--font-display); margin: 0; }
+.csv-manager-panel-heading p { color: #77848c; font-size: 11px; line-height: 1.5; margin: 0; }
+.live-csv-list { display: grid; gap: 8px; }
+.live-csv-item { background: #fff; border: 1px solid #e0e7eb; border-radius: 8px; color: #34434c; cursor: pointer; display: grid; gap: 5px; padding: 11px 12px; text-align: left; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.live-csv-item:hover { border-color: #9aabb5; transform: translateY(-1px); }
+.live-csv-item[aria-pressed="true"] { border-color: #4d9c71; box-shadow: 0 0 0 2px #4d9c7120; }
+.live-csv-item strong { font-size: 12px; }
+.live-csv-item span,
+.live-csv-item small { color: #77848c; font-size: 10px; }
+.csv-upload-form,
+.owner-login-form { display: grid; gap: 12px; }
+.owner-access { border-top: 1px solid #e3e9ec; display: grid; gap: 13px; margin-top: 3px; padding-top: 17px; }
+.owner-session { align-items: center; color: #64737c; display: flex; font-size: 11px; justify-content: space-between; gap: 10px; }
+.pending-submissions { display: grid; gap: 8px; max-height: 250px; overflow-y: auto; }
+.pending-submission { align-items: center; background: #fff; border: 1px solid #e0e7eb; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; padding: 10px; }
+.pending-submission > div:first-child { display: grid; gap: 4px; min-width: 0; }
+.pending-submission strong { font-size: 11px; overflow-wrap: anywhere; }
+.pending-submission small { color: #77848c; font-size: 9px; }
+.pending-submission-actions { align-items: center; display: flex; flex: 0 0 auto; gap: 7px; }
+.pending-submission-actions .upload-submit { min-height: 32px; padding: 0 10px; }
+.pending-submission-actions .upload-signout { min-height: 32px; }
+.submission-preview { background: #f6f8f9; border-radius: 6px; color: #52616a; flex: 1 0 100%; font: 10px/1.5 ui-monospace, Consolas, monospace; margin: 0; max-height: 180px; overflow: auto; padding: 10px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.owner-login-form[hidden],
+#owner-controls[hidden] { display: none; }
+@media (max-width: 720px) {
+  .csv-manager-grid { grid-template-columns: minmax(0, 1fr); }
+  .csv-manager { padding: 19px; }
+}
+html { scroll-behavior: smooth; }
+#overview,
+#subcategories,
+#year-groups,
+#upcoming-trips { scroll-margin-top: 24px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .nav-indicator,
+  .nav-item,
+  .nav-item svg { transition-duration: .01ms; }
+  .section-arrival { animation: none; }
+}
