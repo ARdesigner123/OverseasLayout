@@ -298,10 +298,13 @@ function renderKpis() {
     const rows = dashboardData.students[year] || [];
     const ostRows = rows.filter((row) => row.subcategory === programmeCategories.ost);
     const lexRows = rows.filter((row) => row.subcategory === programmeCategories.lex);
-    const ostCount = uniqueCount(ostRows);
-    const lexCount = uniqueCount(lexRows);
+    const ostStudents = new Set(ostRows.map((row) => row.studentId));
+    const lexStudents = new Set(lexRows.map((row) => row.studentId));
+    const bothCount = [...ostStudents].filter((studentId) => lexStudents.has(studentId)).length;
+    const ostOnlyCount = ostStudents.size - bothCount;
+    const lexOnlyCount = lexStudents.size - bothCount;
     const totalStudents = uniqueCount(rows);
-    const participationCount = uniqueCount([...ostRows, ...lexRows]);
+    const participationCount = ostOnlyCount + lexOnlyCount + bothCount;
     const percentage = totalStudents ? (participationCount / totalStudents) * 100 : null;
     const card = document.querySelector(`[data-kpi-card="${year}"]`);
 
@@ -310,8 +313,9 @@ function renderKpis() {
       : `${percentage.toFixed(1)}%`;
     card.querySelector("[data-kpi-numerator]").textContent = participationCount.toLocaleString();
     card.querySelector("[data-kpi-denominator]").textContent = totalStudents.toLocaleString();
-    card.querySelector("[data-kpi-ost]").textContent = ostCount.toLocaleString();
-    card.querySelector("[data-kpi-lex]").textContent = lexCount.toLocaleString();
+    card.querySelector("[data-kpi-ost-only]").textContent = ostOnlyCount.toLocaleString();
+    card.querySelector("[data-kpi-lex-only]").textContent = lexOnlyCount.toLocaleString();
+    card.querySelector("[data-kpi-both]").textContent = bothCount.toLocaleString();
     card.style.setProperty("--kpi-progress", `${Math.min(percentage ?? 0, 100)}%`);
   });
 }

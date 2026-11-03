@@ -1320,17 +1320,19 @@ html { scroll-behavior: smooth; }
 .kpi-breakdown {
   border-top: 1px solid #e9edef;
   color: #77848c;
-  display: flex;
+  display: grid;
   font-size: 9px;
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
   margin-top: 11px;
   padding-top: 9px;
 }
 
 .kpi-breakdown span {
-  align-items: center;
-  display: inline-flex;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
 }
 
 .kpi-breakdown strong {
