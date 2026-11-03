@@ -289,6 +289,33 @@ function renderSummary(rows) {
   });
 }
 
+function renderKpis() {
+  const programmeCategories = {
+    ost: "Overseas Study Trip (OST)",
+    lex: "Learning Express (LeX)",
+  };
+  yearKeys.forEach((year) => {
+    const rows = dashboardData.students[year] || [];
+    const ostRows = rows.filter((row) => row.subcategory === programmeCategories.ost);
+    const lexRows = rows.filter((row) => row.subcategory === programmeCategories.lex);
+    const ostCount = uniqueCount(ostRows);
+    const lexCount = uniqueCount(lexRows);
+    const totalStudents = uniqueCount(rows);
+    const participationCount = uniqueCount([...ostRows, ...lexRows]);
+    const percentage = totalStudents ? (participationCount / totalStudents) * 100 : null;
+    const card = document.querySelector(`[data-kpi-card="${year}"]`);
+
+    card.querySelector("[data-kpi-percentage]").textContent = percentage === null
+      ? "N/A"
+      : `${percentage.toFixed(1)}%`;
+    card.querySelector("[data-kpi-numerator]").textContent = participationCount.toLocaleString();
+    card.querySelector("[data-kpi-denominator]").textContent = totalStudents.toLocaleString();
+    card.querySelector("[data-kpi-ost]").textContent = ostCount.toLocaleString();
+    card.querySelector("[data-kpi-lex]").textContent = lexCount.toLocaleString();
+    card.style.setProperty("--kpi-progress", `${Math.min(percentage ?? 0, 100)}%`);
+  });
+}
+
 function renderTrips(trips) {
   const grid = document.querySelector("#upcoming-trip-grid");
   validateTrips(trips);
@@ -330,6 +357,7 @@ function renderDashboard() {
   }
   filter.value = selectedYear;
   renderSummary(rows);
+  renderKpis();
   renderSubcategories(rows);
   renderDetail(rows);
   renderCourses(rows);

@@ -27,6 +27,10 @@
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="5" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="11" width="7" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="8" height="7" rx="2" stroke="currentColor" stroke-width="1.7"/></svg>
             <span>Overseas Programmes</span>
           </a>
+          <a class="nav-item" href="#kpis">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="6" r="1.5" fill="currentColor"/></svg>
+            <span>KPIs</span>
+          </a>
           <a class="nav-item" href="#subcategories">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
             <span>Subcategories</span>
@@ -91,6 +95,59 @@
             <div class="intro-status">
               <div class="data-status" id="data-status" role="status" aria-live="polite" data-state="loading">Loading dashboard CSVs…</div>
             </div>
+          </section>
+
+          <section class="kpi-section" id="kpis" aria-labelledby="kpi-heading">
+            <div class="kpi-section-heading">
+              <div>
+                <div class="panel-kicker">STUDENT DEVELOPMENT</div>
+                <h2 id="kpi-heading">Programme participation</h2>
+                <p>Unique students participating in OST or LeX, as a share of each year group.</p>
+              </div>
+              <span class="kpi-formula">Unique OST or LeX students ÷ unique students × 100</span>
+            </div>
+            <div class="kpi-grid">
+              <article class="kpi-card" data-kpi-card="year1" style="--kpi-progress: 0%">
+                <div class="kpi-card-heading">
+                  <div><span class="kpi-eyebrow">STUDENT PARTICIPATION</span><h3>Year 1</h3></div>
+                  <span class="kpi-ring" aria-hidden="true"></span>
+                </div>
+                <strong class="kpi-value" data-kpi-percentage>—</strong>
+                <p class="kpi-caption">Unique students in OST or LeX</p>
+                <p class="kpi-total"><strong data-kpi-numerator>—</strong> participating students <span>/</span> <strong data-kpi-denominator>—</strong> total students</p>
+                <div class="kpi-breakdown">
+                  <span>OST <strong data-kpi-ost>—</strong></span>
+                  <span>LeX <strong data-kpi-lex>—</strong></span>
+                </div>
+              </article>
+              <article class="kpi-card" data-kpi-card="year2" style="--kpi-progress: 0%">
+                <div class="kpi-card-heading">
+                  <div><span class="kpi-eyebrow">STUDENT PARTICIPATION</span><h3>Year 2</h3></div>
+                  <span class="kpi-ring" aria-hidden="true"></span>
+                </div>
+                <strong class="kpi-value" data-kpi-percentage>—</strong>
+                <p class="kpi-caption">Unique students in OST or LeX</p>
+                <p class="kpi-total"><strong data-kpi-numerator>—</strong> participating students <span>/</span> <strong data-kpi-denominator>—</strong> total students</p>
+                <div class="kpi-breakdown">
+                  <span>OST <strong data-kpi-ost>—</strong></span>
+                  <span>LeX <strong data-kpi-lex>—</strong></span>
+                </div>
+              </article>
+              <article class="kpi-card" data-kpi-card="year3" style="--kpi-progress: 0%">
+                <div class="kpi-card-heading">
+                  <div><span class="kpi-eyebrow">STUDENT PARTICIPATION</span><h3>Year 3</h3></div>
+                  <span class="kpi-ring" aria-hidden="true"></span>
+                </div>
+                <strong class="kpi-value" data-kpi-percentage>—</strong>
+                <p class="kpi-caption">Unique students in OST or LeX</p>
+                <p class="kpi-total"><strong data-kpi-numerator>—</strong> participating students <span>/</span> <strong data-kpi-denominator>—</strong> total students</p>
+                <div class="kpi-breakdown">
+                  <span>OST <strong data-kpi-ost>—</strong></span>
+                  <span>LeX <strong data-kpi-lex>—</strong></span>
+                </div>
+              </article>
+            </div>
+            <p class="kpi-note">Each student ID is counted once in the total and once in the combined OST or LeX count, even if they have multiple records or participate in both programmes.</p>
           </section>
 
           <section class="summary-grid" id="year-groups" aria-label="Student overview">
