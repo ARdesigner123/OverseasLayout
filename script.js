@@ -1,5 +1,6 @@
 const yearKeys = ["year1", "year2", "year3"];
 const yearLabels = { all: "All years", year1: "Year 1", year2: "Year 2", year3: "Year 3" };
+const yearTotals = { year1: 606, year2: 574, year3: 532 };
 const yearColors = { year1: "#d3a547", year2: "#4d9c71", year3: "#708ac4" };
 const dataFiles = {
   year1: "Year1.csv",
@@ -303,7 +304,7 @@ function renderKpis() {
     const bothCount = [...ostStudents].filter((studentId) => lexStudents.has(studentId)).length;
     const ostOnlyCount = ostStudents.size - bothCount;
     const lexOnlyCount = lexStudents.size - bothCount;
-    const totalStudents = uniqueCount(rows);
+    const totalStudents = yearTotals[year];
     const participationCount = ostOnlyCount + lexOnlyCount + bothCount;
     const percentage = totalStudents ? (participationCount / totalStudents) * 100 : null;
     const card = document.querySelector(`[data-kpi-card="${year}"]`);
