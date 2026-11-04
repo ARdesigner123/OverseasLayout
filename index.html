@@ -31,6 +31,10 @@
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
             <span>Subcategories</span>
           </a>
+          <a class="nav-item" href="#destinations">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9" r="2.3" stroke="currentColor" stroke-width="1.7"/></svg>
+            <span>Popular Destinations</span>
+          </a>
           <a class="nav-item" href="#year-groups">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M16 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H6.4A3.4 3.4 0 0 0 3 18.4V20M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM21 20v-1.6a3.4 3.4 0 0 0-2.6-3.3M16.5 3.1a4 4 0 0 1 0 7.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
             <span>Year groups</span>
@@ -163,6 +167,37 @@
               <div class="programme-chart" id="course-chart" role="list" aria-label="Students by course"></div>
               <div class="chart-footer"><span class="legend-dot"></span><span>Students are counted once in each course</span></div>
             </article>
+          </section>
+
+          <section class="panel destination-panel" id="destinations" aria-labelledby="destination-heading">
+            <div class="panel-heading destination-heading">
+              <div>
+                <div class="panel-kicker">DESTINATION INSIGHTS</div>
+                <h2 id="destination-heading">Popular destinations</h2>
+                <p class="panel-description" id="destination-description">Unique students by destination city</p>
+              </div>
+              <div class="destination-controls">
+                <label class="destination-search">
+                  <span class="sr-only">Search destination cities</span>
+                  <input id="destination-search" type="search" placeholder="Search cities" autocomplete="off">
+                </label>
+                <label class="select-wrap destination-limit">
+                  <span class="sr-only">Choose how many destinations to show</span>
+                  <select id="destination-limit" aria-label="Choose how many destinations to show">
+                    <option value="6">Top 6</option>
+                    <option value="all">All destinations</option>
+                  </select>
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </label>
+              </div>
+            </div>
+            <div class="destination-summary">
+              <strong id="destination-total">—</strong>
+              <span>unique students in this view</span>
+              <span class="destination-result-count" id="destination-result-count"></span>
+            </div>
+            <div class="destination-chart" id="destination-chart" role="list" aria-label="Unique students by destination city"></div>
+            <div class="chart-footer"><span class="legend-dot"></span><span>Students are counted once per city; a student may visit more than one destination.</span></div>
           </section>
 
           <section class="panel upcoming-panel" id="upcoming-trips" aria-labelledby="upcoming-heading">

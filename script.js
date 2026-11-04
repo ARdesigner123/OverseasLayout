@@ -18,6 +18,12 @@ const courseChart = document.querySelector("#course-chart");
 const courseHeading = document.querySelector("#course-heading");
 const courseDescription = document.querySelector("#course-description");
 const courseTotal = document.querySelector("#course-total");
+const destinationChart = document.querySelector("#destination-chart");
+const destinationDescription = document.querySelector("#destination-description");
+const destinationTotal = document.querySelector("#destination-total");
+const destinationResultCount = document.querySelector("#destination-result-count");
+const destinationSearch = document.querySelector("#destination-search");
+const destinationLimit = document.querySelector("#destination-limit");
 const dataStatus = document.querySelector("#data-status");
 const refreshButton = document.querySelector("#refresh-button");
 const downloadToggle = document.querySelector("#download-toggle");
@@ -270,6 +276,41 @@ function renderCourses(rows) {
   }
 }
 
+function renderDestinations(rows) {
+  const destinationRows = selectedSubcategory
+    ? rows.filter((row) => row.subcategory === selectedSubcategory)
+    : rows;
+  const cities = countBy(destinationRows, "city");
+  const query = destinationSearch.value.trim().toLocaleLowerCase();
+  const filteredCities = cities.filter(({ label }) => formatCity(label).toLocaleLowerCase().includes(query));
+  const visibleCities = destinationLimit.value === "all"
+    ? filteredCities
+    : filteredCities.slice(0, Number(destinationLimit.value));
+  const max = Math.max(...visibleCities.map((city) => city.count), 1);
+  const total = uniqueCount(destinationRows);
+
+  destinationDescription.textContent = selectedSubcategory
+    ? `${selectedSubcategory} · ${yearLabels[selectedYear].toLowerCase()}`
+    : `Unique students by destination city · ${yearLabels[selectedYear].toLowerCase()}`;
+  destinationTotal.textContent = total.toLocaleString();
+  destinationResultCount.textContent = `Showing ${visibleCities.length} of ${filteredCities.length} destinations`;
+  destinationChart.innerHTML = visibleCities.length
+    ? visibleCities.map(({ label, count }, index) => {
+      const share = total ? (count / total) * 100 : 0;
+      return `
+        <div class="destination-row" role="listitem" style="--row-index:${index}">
+          <span class="destination-name">${escapeHtml(formatCity(label))}</span>
+          <span class="destination-track" aria-hidden="true">
+            <span class="destination-fill" style="width:${(count / max) * 100}%"></span>
+          </span>
+          <strong class="destination-count">${count.toLocaleString()}</strong>
+          <span class="destination-share">${share.toFixed(1)}%</span>
+        </div>
+      `;
+    }).join("")
+    : '<p class="empty-chart">No destinations match this search.</p>';
+}
+
 function renderSummary(rows) {
   const yearRows = yearKeys.map((year) => [year, uniqueCount(dashboardData.students[year] || [])]);
   const allCourses = countBy(rows, "course");
@@ -366,6 +407,7 @@ function renderDashboard() {
   renderSubcategories(rows);
   renderDetail(rows);
   renderCourses(rows);
+  renderDestinations(rows);
 }
 
 async function readApiResponse(response) {
@@ -781,6 +823,8 @@ filter.addEventListener("change", (event) => {
   selectedYear = event.target.value;
   renderDashboard();
 });
+destinationSearch.addEventListener("input", () => renderDestinations(visibleRows()));
+destinationLimit.addEventListener("change", () => renderDestinations(visibleRows()));
 document.querySelectorAll(".year-card").forEach((card) => {
   card.addEventListener("click", () => setYear(card.dataset.yearSelection));
 });
