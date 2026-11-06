@@ -1296,6 +1296,17 @@ html { scroll-behavior: smooth; }
   margin-top: 10px;
 }
 
+.kpi-target {
+  color: #c33b35;
+  font-size: 10px;
+  font-weight: 700;
+  margin: 4px 0 0;
+}
+
+.kpi-target strong {
+  color: inherit;
+}
+
 .kpi-caption {
   color: #71808a;
   font-size: 10px;
@@ -1315,29 +1326,6 @@ html { scroll-behavior: smooth; }
 .kpi-total strong {
   color: #3d4c55;
   font-size: 11px;
-}
-
-.kpi-breakdown {
-  border-top: 1px solid #e9edef;
-  color: #77848c;
-  display: grid;
-  font-size: 9px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 11px;
-  padding-top: 9px;
-}
-
-.kpi-breakdown span {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-.kpi-breakdown strong {
-  color: #35434b;
-  font-size: 10px;
 }
 
 .kpi-note {
